@@ -5,10 +5,6 @@ require_once('vendor/autoload.php');
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$dotenv->required('ENVIRONMENT')->notEmpty();
-
-echo $_ENV['ENVIRONMENT'];
-
 // Параметры подключения к WebDAV Яндекс.Диска
 $baseUri = $_ENV['WEBDAV_SERVER'];
 $username = $_ENV['WEBDAV_USERNAME'];
@@ -21,16 +17,50 @@ $client = new Sabre\DAV\Client([
   'password' => $password,
 ]);
 
-// Имя файла с текущей датой и временем
-$filename = 'report-'.date('Y-m-d_H:i:s').'.txt';
+// Путь к папке бекапов на Яндекс.Диске
+$webdav_folder = $_ENV['WEBDAV_FOLDER'];
 
-// Путь к файлу на Яндекс.Диске
-$filePath = '/BackupSaverBot/'.$filename;
+// Папка, в которой хранятся бекапы
+$backupFolder = 'backups';
 
-// Создаем пустой файл на Яндекс.Диске
-try {
-    $client->request('PUT', $filePath);
-    echo "Файл '$filename' успешно создан на Яндекс.Диске.\n";
-} catch (Sabre\HTTP\ClientHttpException $e) {
-    echo "Ошибка при создании файла: ".$e->getMessage()."\n";
+// Маска для поиска файлов бекапа
+$fileMask = $_ENV['FILE_PREFIX'].date('Y-m-d').'_*';
+
+// Получаем список файлов в папке backups
+$localFiles = glob($backupFolder . '/' . $fileMask);
+
+if (!empty($localFiles)) {
+    foreach ($localFiles as $localFile) {
+        // Имя файла без пути
+        $filename = basename($localFile);
+
+        // Путь к файлу на Яндекс.Диске
+        $remoteFilePath = '/'.$webdav_folder.'/'.$filename;
+
+        // Проверяем существование файла на сервере
+        $remoteFileExists = false;
+        try {
+            $response = $client->request('HEAD', $remoteFilePath);
+            if ($response['statusCode'] === 200) {
+                $remoteFileExists = true;
+            }
+        } catch (Sabre\HTTP\ClientHttpException $e) {
+            // Файл не существует на сервере, можно отправлять
+            $remoteFileExists = false;
+        }
+
+        if (!$remoteFileExists) {
+            // Отправляем файл на Яндекс.Диск
+            try {
+                $client->request('PUT', $remoteFilePath, file_get_contents($localFile));
+                echo "Файл '$filename' успешно отправлен на Яндекс.Диск.\n";
+            } catch (Sabre\HTTP\ClientHttpException $e) {
+                echo "Ошибка при отправке файла '$filename' на Яндекс.Диск: ".$e->getMessage()."\n";
+            }
+        } else {
+            echo "Файл '$filename' уже существует на Яндекс.Диске, пропускаем.\n";
+        }
+    }
+} else {
+    echo "Файлы с маской '$fileMask' не найдены в папке '$backupFolder'.\n";
 }
