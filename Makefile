@@ -18,8 +18,10 @@ help:
 
 log: ## Вывод логов
 ifeq ($(ENVIRONMENT), developer)
+	@echo "$(PURPLE) Лог success_runner.log $(RESET)"
 	@tail -f app/logs/success_runner.log
 else
+	@echo "$(PURPLE) Лог error_runner.log $(RESET)"
 	@tail -f app/logs/error_runner.log
 endif
 .PHONY: log
