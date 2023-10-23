@@ -1,0 +1,17 @@
+{
+    "name": "lyucean/backup_app",
+    "description": "BackupSaverBot Telegram Bot",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lyucean",
+            "email": "lyucean@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "vlucas/phpdotenv": "^5.5",
+        "sabre/dav": "^4.4"
+    }
+}

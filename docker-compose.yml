@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  php-cli:
+    container_name: BSB_php
+    profiles: ["main", "dev"]
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+    depends_on:
+      - composer
+    networks:
+      - app_network
+
+  composer:
+    container_name: BSB_composer
+    profiles: ["main", "dev"]
+    image: composer
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: install
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
