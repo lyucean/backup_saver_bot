@@ -30,7 +30,7 @@ while (true) {
     // Выполняем целевой скрипт и сохраняем вывод в переменную
     $command = "php $targetScript";
     $output = [];
-//    exec($command, $output);
+    exec($command, $output);
 
     // Засекаем время после выполнения скрипта и вычисляем разницу в миллисекундах
     $endTime = microtime(true);
