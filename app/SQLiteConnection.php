@@ -36,6 +36,7 @@ class SQLiteConnection {
         $stmt->execute();
     }
 
+    // Метод для проверки существования записи об отправке
     public function fileExists($filename): bool
     {
         $query = "SELECT COUNT(*) FROM sent_files WHERE filename = :filename";

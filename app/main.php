@@ -24,25 +24,19 @@ $client = new Sabre\DAV\Client([
 $webdav_folder = $_ENV['WEBDAV_FOLDER'];
 
 // Проверяем существование папки на Яндекс.Диске
-$remoteFolderExists = false;
 try {
     $response = $client->request('PROPFIND', '/'.$webdav_folder);
-    if ($response['statusCode'] === 200) {
-        $remoteFolderExists = true;
+    if ($response['statusCode'] === 404) { // если не существует, вернёт 404
+        // Папка не существует на сервере
+        try {
+            $client->request('MKCOL', '/'.$webdav_folder); // Создаем папку на Яндекс.Диске
+            echo "Папка '$webdav_folder' успешно создана на Яндекс.Диске.\n";
+        } catch (Exception $e) {
+            echo "Ошибка при создании папки '$webdav_folder' на Яндекс.Диске: ".$e->getMessage()."\n";
+        }
     }
-} catch (Error $e) {
-    // Папка не существует на сервере
-    $remoteFolderExists = false;
-}
-
-if (!$remoteFolderExists) {
-    // Создаем папку на Яндекс.Диске
-    try {
-        $client->request('MKCOL', '/'.$webdav_folder);
-        echo "Папка '$webdav_folder' успешно создана на Яндекс.Диске.\n";
-    } catch (Sabre\HTTP\ClientHttpException $e) {
-        echo "Ошибка при создании папки '$webdav_folder' на Яндекс.Диске: ".$e->getMessage()."\n";
-    }
+} catch (Exception $e) {
+    echo "Ошибка при проверки папки '$webdav_folder' на Яндекс.Диске: ".$e->getMessage()."\n";
 }
 
 // Папка, в которой хранятся бекапы
@@ -73,7 +67,7 @@ if (!empty($localFiles)) {
                 // Записываем информацию о файле в базу данных
                 $sent_date = date('Y-m-d H:i:s');
                 $db->insertFile($filename, $sent_date);
-            } catch (Sabre\HTTP\ClientHttpException $e) {
+            } catch (Exception $e) {
                 echo "Ошибка при отправке файла '$filename' на Яндекс.Диск: ".$e->getMessage()."" . PHP_EOL;
             }
         } else {
