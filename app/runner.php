@@ -44,11 +44,8 @@ while (true) {
     // Замедляем текущую итерацию, чтобы избежать нагрузки на сервер
     sleep($periodChecked); // Задержка в секундах перед каждой итерацией цикла
 
-    // Определяем текущее время
-    $currentTime = time();
-
     // Проверяем, если скрипт работает больше нужного, перезапустим его
-    if ($currentTime - $_SERVER['REQUEST_TIME'] >= $max_execution_time) {
+    if (time() - $_SERVER['REQUEST_TIME'] >= $max_execution_time) {
         // Запускаем новый экземпляр скрипта
         exec('php ' . __FILE__ . ' >> ' . $logFile_error . ' 2>&1 &');
         exit(); // Завершаем текущий экземпляр скрипта
