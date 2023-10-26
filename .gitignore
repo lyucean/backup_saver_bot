@@ -1,5 +1,6 @@
 /app/logs/*
 /app/.env
+/app/file_generator.php
 /.idea/
 /app/vendor/
 /app/sqlite/db_bsb.db

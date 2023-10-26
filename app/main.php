@@ -12,6 +12,7 @@ $dotenv->required('ENVIRONMENT')->notEmpty();
 $baseUri = $_ENV['WEBDAV_SERVER'];
 $username = $_ENV['WEBDAV_USERNAME'];
 $password = $_ENV['WEBDAV_PASSWORD'];
+$maximum_storage_day = $_ENV['MAXIMUM_STORAGE_DAY'];
 
 // Создаем клиент WebDAV
 $client = new Sabre\DAV\Client([
@@ -75,8 +76,35 @@ if (!empty($localFiles)) {
         }
     }
 } else {
-    echo "Файлы с маской '$fileMask' не найдены в папке '$backupFolder'.\n";
+    echo "Файлы с маской '$fileMask' не найдены в папке '$backupFolder'." . PHP_EOL;
+}
+// Удаляем файлы, старше 7 дней с сервера, с sqlite и с Яндекс.Диска
+foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
+
+    // Проверяем, есть ли файл на сервере
+    $localFilePath = $backupFolder . '/' . $filename;
+
+    if (file_exists($localFilePath)) {
+        unlink($localFilePath); // Удаляем файл с сервера
+        echo "Файл '$filename' удален с сервера." . PHP_EOL;
+    }else{
+        echo "Файл '$filename' не может быть удалён, т.к. не найден." . PHP_EOL;
+    }
+
+    // Проверяем, есть ли файл на Яндекс.Диске
+    $remoteFilePath = '/' . $webdav_folder . '/' . $filename;
+    try {
+        $response = $client->request('HEAD', $remoteFilePath);
+        if ($response['statusCode'] === 200) {
+            $client->request('DELETE', $remoteFilePath); // Удаляем файл с Яндекс.Диска
+            echo "Файл '$filename' удален с Яндекс.Диска." . PHP_EOL;
+        }
+    } catch (Exception $e) {
+        echo "Файл '$filename' не существует на Яндекс.Диске." . PHP_EOL;
+    }
+
+    $db->markFileAsDeleted($filename); // Помечаем файл как удаленный в базе данных
+    echo "Запись о файле '$filename' помечена как удаленная в базе данных." . PHP_EOL;
 }
 
-// Закрываем соединение с базой данных
-$db->close();
+$db->close(); // Закрываем соединение с базой данных
