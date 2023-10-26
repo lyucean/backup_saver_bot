@@ -12,6 +12,7 @@
     "minimum-stability": "stable",
     "require": {
         "vlucas/phpdotenv": "^5.5",
-        "sabre/dav": "^4.4"
+        "sabre/dav": "^4.4",
+        "ext-sqlite3": "*"
     }
 }
