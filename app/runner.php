@@ -1,13 +1,10 @@
 <?php
-/**
- * Этот скрипт запускает основной скрипт бота $periodChecked секунду и пишет логи от его выполнения.
- */
-
-$max_execution_time = 60; // Зададим максимальное время выполнения нашего скрипта
 $logFile_success = 'logs/success_runner.log'; // Где будем хранить логи работы бота
 $logFile_error = 'logs/error_runner.log'; // Где будем хранить логи работы бота
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
-$periodChecked = 10; // Период проверки скрипта
+$periodChecked = $_ENV['PERIOD_SECONDS_RUN']; // Период запуска скрипта
+$max_execution_time = $_ENV['MAX_EXECUTION_TIME']; // Зададим максимальное время выполнения нашего скрипта
+set_time_limit($max_execution_time+2); // Устанавливаем максимальное время выполнения скрипта в +2 секунду, чтоб он завершался сам
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($logFile_success)) {
@@ -26,9 +23,6 @@ if (count($logContents) >= 2000) {
     file_put_contents($logFile_success, implode('', $logContents));
 }
 
-// Устанавливаем максимальное время выполнения скрипта в 60 секунд
-set_time_limit(60);
-
 // Бесконечный цикл, который будет вызывать основной файл скрипта
 while (true) {
     // Засекаем время до выполнения скрипта
@@ -40,15 +34,14 @@ while (true) {
     exec($command, $output);
 
     // Засекаем время после выполнения скрипта и вычисляем разницу в миллисекундах
-    $endTime = microtime(true);
-    $executionTimeMs = ($endTime - $startTime) * 1000;
+    $executionTimeMs = (microtime(true) - $startTime) * 1000;
 
     // Записываем вывод и время выполнения в лог файл
     $logMessage = date('Y-m-d H:i:s') . " : Execution time: " . number_format($executionTimeMs, 2) . " ms\n";
     $logMessage .= '    ' . implode("\n", $output) . PHP_EOL;
     file_put_contents($logFile_success, $logMessage, FILE_APPEND);
 
-    // Завершаем текущую итерацию, чтобы избежать нагрузки на сервер
+    // Замедляем текущую итерацию, чтобы избежать нагрузки на сервер
     sleep($periodChecked); // Задержка в секундах перед каждой итерацией цикла
 
     // Определяем текущее время
