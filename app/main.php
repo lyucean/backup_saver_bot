@@ -46,16 +46,16 @@ if (!empty($localFiles)) {
             // Отправляем файл на Яндекс.Диск
             try {
                 $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
-                echo "Файл '$filename' успешно отправлен на Яндекс.Диск.\n";
+                echo "Файл '$filename' успешно отправлен на Яндекс.Диск." . PHP_EOL;
 
                 // Записываем информацию о файле в базу данных
                 $sent_date = date('Y-m-d H:i:s');
                 $db->insertFile($filename, $sent_date);
             } catch (Sabre\HTTP\ClientHttpException $e) {
-                echo "Ошибка при отправке файла '$filename' на Яндекс.Диск: ".$e->getMessage()."\n";
+                echo "Ошибка при отправке файла '$filename' на Яндекс.Диск: ".$e->getMessage()."" . PHP_EOL;
             }
         } else {
-            echo "Файл '$filename' уже отправлен на Яндекс.Диск, пропускаем.\n";
+            echo "Файл '$filename' уже отправлен на Яндекс.Диск, пропускаем." . PHP_EOL;
         }
     }
 } else {
