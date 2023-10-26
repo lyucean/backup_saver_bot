@@ -19,6 +19,13 @@ if (!file_exists($logFile_error)) {
     chmod($logFile_error, 0777); // поправим права
 }
 
+// Проверяем количество строк в файле и удаляем первые 1000 строк, если нужно
+$logContents = file($logFile_success);
+if (count($logContents) >= 2000) {
+    $logContents = array_slice($logContents, 1000);
+    file_put_contents($logFile_success, implode('', $logContents));
+}
+
 // Устанавливаем максимальное время выполнения скрипта в 60 секунд
 set_time_limit(60);
 
