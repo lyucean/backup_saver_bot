@@ -10,7 +10,7 @@ WORKDIR /app
 RUN apt-get install -y zip unzip
 
 # Установка расширения git для работы с composer
-RUN apt-get install -y git
+#RUN apt-get install -y git
 
 # Установка Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
