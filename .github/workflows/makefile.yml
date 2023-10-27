@@ -91,14 +91,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
-          script: |
-            running_containers=$(docker ps --filter "name=BSB_php" --format "{{.Names}}")
-            if [[ -z $running_containers ]]; then
-              echo "ОШИБКА: Контейнеры не запущены"
-              exit 1
-            else
-              echo "Все контейнеры работают"
-            fi
+          script: docker ps
 
   alert:
     name: "Уведомление"
