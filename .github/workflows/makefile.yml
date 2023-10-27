@@ -1,4 +1,6 @@
-name: Makefile CI
+name: Deployment
+
+concurrency: production
 
 on:
   push:
@@ -7,21 +9,113 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
 
+  build:
+    name: "Заполним переменных окружения"
     runs-on: ubuntu-latest
+    environment: production  # использовать среду "production"
 
     steps:
-    - uses: actions/checkout@v3
+      - name: "Инициализация репозитория"
+        uses: actions/checkout@v3
 
-    - name: configure
-      run: ./configure
+      - name: "Заполнение переменных среды"
+        run: |
+          echo "WEBDAV_SERVER=${{ secrets.WEBDAV_SERVER }}" >> .env
+          echo "WEBDAV_USERNAME=${{ secrets.WEBDAV_USERNAME }}" >> .env
+          echo "WEBDAV_PASSWORD=${{ secrets.WEBDAV_PASSWORD }}" >> .env
+          
+          echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}" >> .env
+          echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env
+          echo "FILE_PREFIX=${{ vars.FILE_PREFIX }}" >> .env
+          echo "BACKUPS_FOLDER=${{ vars.BACKUPS_FOLDER }}" >> .env
+          echo "MAXIMUM_STORAGE_DAY=${{ vars.MAXIMUM_STORAGE_DAY }}" >> .env
+          echo "PERIOD_SECONDS_RUN=${{ vars.PERIOD_SECONDS_RUN }}" >> .env
+          echo "MAX_EXECUTION_TIME=${{ vars.MAX_EXECUTION_TIME }}" >> .env
 
-    - name: Install dependencies
-      run: make
+      - name: "Создадим каталог проекта"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            mkdir -p ${{ vars.PROJECT_PATH }}
 
-    - name: Run check
-      run: make check
+      - name: "Скопируйте .env в папку проекта."
+        run: cp .env ./app
 
-    - name: Run distcheck
-      run: make distcheck
+      - name: "Скопируйте файлы приложения на удаленный сервер."
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "./*"
+          target: ${{ vars.PROJECT_PATH }}
+
+  deploy:
+    name: "Запуск контейнера"
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    environment: production  # использовать среду "production"
+    steps:
+      - name: "Поднимем docker-compose"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ vars.PROJECT_PATH }}
+            make docker-pull                    
+            make docker-build                    
+            make docker-up                    
+            make composer-install                    
+            make wait-for-mysql                      
+            make migrate
+
+  test:
+    name: "Тест"
+    runs-on: ubuntu-latest
+    needs: [ deploy ]
+    steps:
+      - name: "Подготовка репозитория"
+        uses: actions/checkout@v3
+
+      - name: "Проверим, что наши контейнеры запустились"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            running_containers=$(docker ps --filter "name=BSB_php" --format "{{.Names}}")
+            if [[ -z $running_containers ]]; then
+              echo "ОШИБКА: Контейнеры не запущены"
+              exit 1
+            else
+              echo "Все контейнеры работают"
+            fi
+
+  alert:
+    name: "Уведомление"
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - name: "Отправить телеграмму по push-уведомлению"
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            ${{ github.actor }} создал commit:
+            Commit: ${{ github.event.commits[0].message }}
+
+            Репозиторий: ${{ github.repository }}
+
+            Изменения: https://github.com/${{ github.repository }}/commit/${{github.sha}}
