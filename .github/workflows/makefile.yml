@@ -74,9 +74,7 @@ jobs:
             make docker-pull                    
             make docker-build                    
             make docker-up                    
-            make composer-install                    
-            make wait-for-mysql                      
-            make migrate
+            make composer-install       
 
   test:
     name: "Тест"
