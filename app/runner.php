@@ -1,4 +1,11 @@
 <?php
+require_once('vendor/autoload.php');
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+$dotenv->required('PERIOD_SECONDS_RUN')->notEmpty();
+$dotenv->required('MAX_EXECUTION_TIME')->notEmpty();
+
 $logFile_success = 'logs/success_runner.log'; // Где будем хранить логи работы бота
 $logFile_error = 'logs/error_runner.log'; // Где будем хранить логи работы бота
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту

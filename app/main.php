@@ -14,8 +14,6 @@ $dotenv->required('WEBDAV_FOLDER')->notEmpty();
 $dotenv->required('FILE_PREFIX')->notEmpty();
 $dotenv->required('BACKUPS_FOLDER')->notEmpty();
 $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
-$dotenv->required('PERIOD_SECONDS_RUN')->notEmpty();
-$dotenv->required('MAX_EXECUTION_TIME')->notEmpty();
 
 // Параметры подключения к WebDAV Яндекс Диска
 $baseUri = $_ENV['WEBDAV_SERVER'];
