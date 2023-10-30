@@ -51,7 +51,7 @@ try {
 $backupFolder = 'backups';
 
 // Маска для поиска файлов бекапа
-$fileMask = $_ENV['FILE_PREFIX'].date('Y-m-d').'_*';
+$fileMask = $_ENV['FILE_PREFIX'];
 
 // Подключение к базе данных SQLite
 $db = new SQLiteConnection();
