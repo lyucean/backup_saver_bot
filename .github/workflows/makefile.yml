@@ -27,11 +27,11 @@ jobs:
           
           echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}" >> .env
           echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env
-          echo "FILE_PREFIX=${{ vars.FILE_PREFIX }}" >> .env
           echo "BACKUPS_FOLDER=${{ vars.BACKUPS_FOLDER }}" >> .env
           echo "MAXIMUM_STORAGE_DAY=${{ vars.MAXIMUM_STORAGE_DAY }}" >> .env
           echo "PERIOD_SECONDS_RUN=${{ vars.PERIOD_SECONDS_RUN }}" >> .env
           echo "MAX_EXECUTION_TIME=${{ vars.MAX_EXECUTION_TIME }}" >> .env
+          echo "FILE_MASK=${{ vars.FILE_MASK }}" >> .env
 
       - name: "Создадим каталог проекта"
         uses: appleboy/ssh-action@master

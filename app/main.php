@@ -11,7 +11,7 @@ $dotenv->required('WEBDAV_SERVER')->notEmpty();
 $dotenv->required('WEBDAV_USERNAME')->notEmpty();
 $dotenv->required('WEBDAV_PASSWORD')->notEmpty();
 $dotenv->required('WEBDAV_FOLDER')->notEmpty();
-$dotenv->required('FILE_PREFIX')->notEmpty();
+$dotenv->required('FILE_MASK')->notEmpty();
 $dotenv->required('BACKUPS_FOLDER')->notEmpty();
 $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
 
@@ -51,7 +51,7 @@ try {
 $backupFolder = 'backups';
 
 // Маска для поиска файлов бекапа
-$fileMask = $_ENV['FILE_PREFIX'];
+$fileMask = $_ENV['FILE_MASK'];
 
 // Подключение к базе данных SQLite
 $db = new SQLiteConnection();
