@@ -40,20 +40,20 @@ $client = new Sabre\DAV\Client([
 $webdav_folder = $_ENV['WEBDAV_FOLDER'];
 
 // Проверяем существование папки на Яндекс Диске
-try {
-    $response = $client->request('PROPFIND', '/'.$webdav_folder);
-    if ($response['statusCode'] === 404) { // если не существует, вернёт 404
-        // Папка не существует на сервере
-        try {
-            $client->request('MKCOL', '/'.$webdav_folder); // Создаем папку на Яндекс Диске
-            echo "Папка '$webdav_folder' успешно создана на Яндекс Диске.\n";
-        } catch (Exception $e) {
-            echo "Ошибка при создании папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
-        }
-    }
-} catch (Exception $e) {
-    echo "Ошибка при проверки папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
-}
+//try {
+//    $response = $client->request('PROPFIND', '/'.$webdav_folder);
+//    if ($response['statusCode'] === 404) { // если не существует, вернёт 404
+//        // Папка не существует на сервере
+//        try {
+//            $client->request('MKCOL', '/'.$webdav_folder); // Создаем папку на Яндекс Диске
+//            echo "Папка '$webdav_folder' успешно создана на Яндекс Диске.\n";
+//        } catch (Exception $e) {
+//            echo "Ошибка при создании папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
+//        }
+//    }
+//} catch (Exception $e) {
+//    echo "Ошибка при проверки папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
+//}
 
 // Папка, в которой хранятся бекапы
 $backupFolder = 'backups';
@@ -76,6 +76,8 @@ if (!empty($localFiles)) {
         // Проверяем существование файла в базе данных
         if (!$db->fileExists($filename)) {
             // Отправляем файл на Яндекс Диск
+            echo "Отправляем файл '$filename' на Яндекс Диск" . PHP_EOL;
+
             try {
                 $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
                 echo "Файл '$filename' успешно отправлен на Яндекс Диск." . PHP_EOL;
@@ -84,7 +86,7 @@ if (!empty($localFiles)) {
                 $sent_date = date('Y-m-d H:i:s');
                 $db->insertFile($filename, $sent_date);
             } catch (Exception $e) {
-                echo "Ошибка при отправке файла '$filename' на Яндекс Диск: ".$e->getMessage()."" . PHP_EOL;
+                echo "Ошибка при отправке файла '$filename' на Яндекс Диск: ".$e->getMessage(). PHP_EOL;
             }
         } else {
             echo "Файл '$filename' уже отправлен на Яндекс Диск, пропускаем." . PHP_EOL;
@@ -93,6 +95,7 @@ if (!empty($localFiles)) {
 } else {
     echo "Файлы с маской '$fileMask' не найдены в папке '$backupFolder'." . PHP_EOL;
 }
+
 // Удаляем файлы, старше 7 дней с сервера, с sqlite и с Яндекс Диска
 foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
 

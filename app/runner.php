@@ -9,8 +9,9 @@ $dotenv->required('MAX_EXECUTION_TIME')->notEmpty();
 $logFile_success = 'logs/success_runner.log'; // Где будем хранить логи работы бота
 $logFile_error = 'logs/error_runner.log'; // Где будем хранить логи работы бота
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
-$periodChecked = $_ENV['PERIOD_SECONDS_RUN']; // Период запуска скрипта
-$max_execution_time = $_ENV['MAX_EXECUTION_TIME']; // Зададим максимальное время выполнения нашего скрипта
+$periodChecked = $_ENV['PERIOD_SECONDS_RUN']; // Период задержки
+set_time_limit($_ENV['MAX_EXECUTION_TIME']); // Устанавливаем максимальное время выполнения скрипта в +2 секунду, чтоб он завершался сам
+
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($logFile_success)) {
@@ -30,7 +31,7 @@ if (count($logContents) >= 2000) {
 }
 
 // Бесконечный цикл, который будет вызывать основной файл скрипта
-while (true) {
+//while (true) {
     // Засекаем время до выполнения скрипта
     $startTime = microtime(true);
 
@@ -47,13 +48,12 @@ while (true) {
     $logMessage .= '    ' . implode("\n", $output) . PHP_EOL;
     file_put_contents($logFile_success, $logMessage, FILE_APPEND);
 
-    // Замедляем текущую итерацию, чтобы избежать нагрузки на сервер
     sleep($periodChecked); // Задержка в секундах перед каждой итерацией цикла
 
     // Проверяем, если скрипт работает больше нужного, перезапустим его
-    if (time() - $_SERVER['REQUEST_TIME'] >= $max_execution_time) {
+//    if (time() - $_SERVER['REQUEST_TIME'] >= $max_execution_time) {
         // Запускаем новый экземпляр скрипта
         exec('php ' . __FILE__ . ' >> ' . $logFile_error . ' 2>&1 &');
         exit(); // Завершаем текущий экземпляр скрипта
-    }
-}
+//    }
+//}
