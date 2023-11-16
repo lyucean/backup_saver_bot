@@ -15,6 +15,14 @@ $dotenv->required('FILE_MASK')->notEmpty();
 $dotenv->required('BACKUPS_FOLDER')->notEmpty();
 $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
 
+// Копим логи ошибок в Sentry
+if (!empty($_ENV['SENTRY_DNS'])) {
+    \Sentry\init([
+      'dsn' => $_ENV['SENTRY_DNS'],
+      'environment' => $_ENV['ENVIRONMENT']
+    ]);
+}
+
 // Параметры подключения к WebDAV Яндекс Диска
 $baseUri = $_ENV['WEBDAV_SERVER'];
 $username = $_ENV['WEBDAV_USERNAME'];
