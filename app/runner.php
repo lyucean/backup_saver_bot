@@ -44,7 +44,7 @@ while (true) {
     $executionTimeMs = (microtime(true) - $startTime) * 1000;
 
     // Записываем вывод и время выполнения в лог файл
-    $logMessage = date('Y-m-d H:i:s') . " : Execution time: " . number_format($executionTimeMs, 2) . " ms\n";
+    $logMessage = date('Y-m-d H:i:s') . " : Время выполнения: " . number_format($executionTimeMs, 2) . " ms\n";
     $logMessage .= '    ' . implode("\n", $output) . PHP_EOL;
     file_put_contents($logFile_success, $logMessage, FILE_APPEND);
 
