@@ -11,7 +11,6 @@ $logFile_error = 'logs/error_runner.log'; // Где будем хранить л
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
 $periodChecked = $_ENV['PERIOD_SECONDS_RUN']; // Период запуска скрипта
 $max_execution_time = $_ENV['MAX_EXECUTION_TIME']; // Зададим максимальное время выполнения нашего скрипта
-set_time_limit($max_execution_time+2); // Устанавливаем максимальное время выполнения скрипта в +2 секунду, чтоб он завершался сам
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($logFile_success)) {
