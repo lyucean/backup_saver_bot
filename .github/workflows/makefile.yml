@@ -80,6 +80,7 @@ jobs:
     name: "Уведомление"
     runs-on: ubuntu-latest
     needs: [ deploy ]
+    environment: production  # использовать среду "production"
     steps:
       - name: "Отправить телеграмму по push-уведомлению"
         uses: appleboy/telegram-action@master
