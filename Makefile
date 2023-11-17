@@ -16,16 +16,6 @@ help:
 	@grep -E '^[a-zA-Z-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-17s\033[0m %s\n", $$1, $$2}'
 .PHONY: help
 
-log: ## Вывод логов
-ifeq ($(ENVIRONMENT), developer)
-	@echo "$(PURPLE) Лог success_runner.log $(RESET)"
-	@tail -f app/logs/success_runner.log
-else
-	@echo "$(PURPLE) Лог error_runner.log $(RESET)"
-	@tail -f app/logs/error_runner.log
-endif
-.PHONY: log
-
 # Если это developer окружение, то подключим debug профиль
 PROFILE =
 ifeq ($(ENVIRONMENT),developer)
@@ -35,13 +25,13 @@ else
 endif
 
 init: ## Инициализация проекта
-init: clean docker-down docker-pull docker-build docker-up composer-install log
+init: clean docker-down docker-pull docker-build docker-up composer-install
 
 update: ## Пересобрать контейнер, обновить композер и миграции
-update: clean docker-down docker-pull docker-build docker-up composer-install log
+update: clean docker-down docker-pull docker-build docker-up composer-install
 
 restart: ## Restart docker containers
-restart: clean docker-down docker-up log
+restart: clean docker-down docker-up
 
 php-bash: ## Подключается к контейнеру PHP
 	docker-compose $(ENV) exec php-cli bash
@@ -72,3 +62,7 @@ docker-down: ## Остановим контейнеры
 clean:  ## Очистим папку логов
 	@echo "$(PURPLE) Очистим папку логов $(RESET)"
 	rm -f app/logs/*
+
+log: ## Вывод логов
+	@echo "$(PURPLE) Лог success_runner.log $(RESET)"
+	@tail -f app/logs/runner.log
