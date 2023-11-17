@@ -22,7 +22,8 @@ $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
 if (!empty($_ENV['SENTRY_DNS'])) {
     \Sentry\init([
       'dsn' => $_ENV['SENTRY_DNS'],
-      'environment' => $_ENV['ENVIRONMENT']
+      'environment' => $_ENV['ENVIRONMENT'],
+      'release' =>  'bsb@' . date("Y-m-d_H.i", filectime(__FILE__))
     ]);
 }
 
