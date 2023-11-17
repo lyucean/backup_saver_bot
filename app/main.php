@@ -1,7 +1,7 @@
 <?php
 
 require_once('vendor/autoload.php');
-require_once('SQLiteConnection.php');
+require_once('db.php');
 
 use Monolog\Logger;
 use Logtail\Monolog\LogtailHandler;
@@ -42,7 +42,7 @@ $client = new Sabre\DAV\Client([
 ]);
 
 // Подключение к базе данных SQLite
-$db = new SQLiteConnection();
+$db = new SQLite();
 
 $maximum_storage_day = $_ENV['MAXIMUM_STORAGE_DAY']; // Сколько дней храним архив
 $webdav_folder = $_ENV['WEBDAV_FOLDER']; // Путь к папке бекапов на WEBDAV_SERVER

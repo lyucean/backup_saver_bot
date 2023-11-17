@@ -1,10 +1,12 @@
 <?php
 
-class SQLiteConnection {
+class SQLite {
     private $db;
 
     public function __construct() {
         $this->db = $this->connect();
+
+        $this->init(); // Создадим таблицы, если их нет
     }
 
     private function connect(): SQLite3
@@ -21,7 +23,7 @@ class SQLiteConnection {
         }
     }
 
-    public function createTable(): void
+    public function init(): void
     {
         $query = "CREATE TABLE IF NOT EXISTS sent_files (filename TEXT, sent_date DATETIME)";
         $this->db->exec($query);
