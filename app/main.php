@@ -33,48 +33,21 @@ $logger = new Logger("bsb");
 $logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
 $logger->info("Запуск Runner");
 
-// Параметры подключения к WebDAV Яндекс Диска
-$baseUri = $_ENV['WEBDAV_SERVER'];
-$username = $_ENV['WEBDAV_USERNAME'];
-$password = $_ENV['WEBDAV_PASSWORD'];
-$maximum_storage_day = $_ENV['MAXIMUM_STORAGE_DAY'];
 
 // Создаем клиент WebDAV
 $client = new Sabre\DAV\Client([
-  'baseUri' => $baseUri,
-  'userName' => $username,
-  'password' => $password,
+  'baseUri' => $_ENV['WEBDAV_SERVER'],
+  'userName' => $_ENV['WEBDAV_USERNAME'],
+  'password' => $_ENV['WEBDAV_PASSWORD'],
 ]);
-
-// Путь к папке бекапов на WEBDAV_SERVER
-$webdav_folder = $_ENV['WEBDAV_FOLDER'];
-
-// Проверяем существование папки на Яндекс Диске
-//try {
-//    $response = $client->request('PROPFIND', '/'.$webdav_folder);
-//    if ($response['statusCode'] === 404) { // если не существует, вернёт 404
-//        // Папка не существует на сервере
-//        try {
-//            $client->request('MKCOL', '/'.$webdav_folder); // Создаем папку на Яндекс Диске
-//            echo "Папка '$webdav_folder' успешно создана на Яндекс Диске.\n";
-//        } catch (Exception $e) {
-//            echo "Ошибка при создании папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
-//        }
-//    }
-//} catch (Exception $e) {
-//    echo "Ошибка при проверки папки '$webdav_folder' на Яндекс Диске: ".$e->getMessage()."\n";
-//}
-
-// Папка, в которой хранятся бекапы
-$backupFolder = 'backups';
-
-// Маска для поиска файлов бекапа
-$fileMask = $_ENV['FILE_MASK'];
-
 
 // Подключение к базе данных SQLite
 $db = new SQLiteConnection();
-$db->createTable(); // Создаем таблицу, если она не существует
+
+$maximum_storage_day = $_ENV['MAXIMUM_STORAGE_DAY']; // Сколько дней храним архив
+$webdav_folder = $_ENV['WEBDAV_FOLDER']; // Путь к папке бекапов на WEBDAV_SERVER
+$backupFolder = 'backups'; // Папка, в которой хранятся бекапы
+$fileMask = $_ENV['FILE_MASK']; // Маска для поиска файлов бекапа
 
 // Получаем список файлов в папке backups
 $localFiles = glob($backupFolder . '/' . $fileMask);
