@@ -5,6 +5,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 $dotenv->required('PERIOD_START_RUNNER')->notEmpty();
 $dotenv->required('PERIOD_START_MAIN')->notEmpty();
+$dotenv->required('ENVIRONMENT')->notEmpty();
 
 $logFile_success = 'logs/success_runner.log'; // Где будем хранить логи работы бота
 $logFile_error = 'logs/error_runner.log'; // Где будем хранить логи работы бота
@@ -12,6 +13,15 @@ $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому
 $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько минут будет перезапускаться runner.php
 $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
+date_default_timezone_set('Europe/Moscow'); // московский регион
+
+// Копим логи ошибок в Sentry
+if (!empty($_ENV['SENTRY_DNS'])) {
+    \Sentry\init([
+      'dsn' => $_ENV['SENTRY_DNS'],
+      'environment' => $_ENV['ENVIRONMENT']
+    ]);
+}
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($logFile_success)) {
