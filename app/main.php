@@ -31,7 +31,7 @@ if (!empty($_ENV['SENTRY_DNS'])) {
 // Подключим класс логов
 $logger = new Logger("bsb");
 $logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
-$logger->info("Запуск Runner");
+$logger->notice("Запуск Runner, в окружении: " . $_ENV['ENVIRONMENT']);
 
 
 // Создаем клиент WebDAV
