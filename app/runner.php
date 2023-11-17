@@ -9,10 +9,9 @@ $dotenv->required('MAX_EXECUTION_TIME')->notEmpty();
 $logFile_success = 'logs/success_runner.log'; // Где будем хранить логи работы бота
 $logFile_error = 'logs/error_runner.log'; // Где будем хранить логи работы бота
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
-$period_main = $_ENV['PERIOD_SECONDS_RUN']; // Раз во сколько минут будет запускаться main.php
-$period_runner = $_ENV['MAX_EXECUTION_TIME']; // Раз во сколько минут будет перезапускаться runner.php
+$period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько минут будет перезапускаться runner.php
+$period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
-
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($logFile_success)) {
