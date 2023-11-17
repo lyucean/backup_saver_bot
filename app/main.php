@@ -1,9 +1,10 @@
 <?php
-use Monolog\Logger;
-use Logtail\Monolog\LogtailHandler;
 
 require_once('vendor/autoload.php');
 require_once('SQLiteConnection.php');
+
+use Monolog\Logger;
+use Logtail\Monolog\LogtailHandler;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -27,9 +28,8 @@ if (!empty($_ENV['SENTRY_DNS'])) {
     ]);
 }
 
-
 // Подключим класс логов
-$logger = new Logger("example");
+$logger = new Logger("bsb");
 $logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
 $logger->info("Запуск Runner");
 
