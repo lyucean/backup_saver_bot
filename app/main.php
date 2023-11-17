@@ -1,4 +1,6 @@
 <?php
+use Monolog\Logger;
+use Logtail\Monolog\LogtailHandler;
 
 require_once('vendor/autoload.php');
 require_once('SQLiteConnection.php');
@@ -6,6 +8,7 @@ require_once('SQLiteConnection.php');
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
+// Проверка конфига
 $dotenv->required('ENVIRONMENT')->notEmpty();
 $dotenv->required('WEBDAV_SERVER')->notEmpty();
 $dotenv->required('WEBDAV_USERNAME')->notEmpty();
@@ -22,6 +25,12 @@ if (!empty($_ENV['SENTRY_DNS'])) {
       'environment' => $_ENV['ENVIRONMENT']
     ]);
 }
+
+
+// Подключим класс логов
+$logger = new Logger("example");
+$logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
+$logger->info("Запуск Runner");
 
 // Параметры подключения к WebDAV Яндекс Диска
 $baseUri = $_ENV['WEBDAV_SERVER'];
@@ -61,6 +70,7 @@ $backupFolder = 'backups';
 // Маска для поиска файлов бекапа
 $fileMask = $_ENV['FILE_MASK'];
 
+
 // Подключение к базе данных SQLite
 $db = new SQLiteConnection();
 $db->createTable(); // Создаем таблицу, если она не существует
@@ -69,44 +79,49 @@ $db->createTable(); // Создаем таблицу, если она не су�
 $localFiles = glob($backupFolder . '/' . $fileMask);
 
 if (!empty($localFiles)) {
-    foreach ($localFiles as $localFile) {
-        // Имя файла без пути
-        $filename = basename($localFile);
 
-        // Проверяем существование файла в базе данных
+    $logger->info("Файлы найдены", $localFiles);
+
+    foreach ($localFiles as $localFile) {
+
+        $filename = basename($localFile); // Имя файла без пути
+
         if (!$db->fileExists($filename)) {
-            // Отправляем файл на Яндекс Диск
-            echo "Отправляем файл '$filename' на Яндекс Диск" . PHP_EOL;
+
+            $logger->info("Отправляем файл '$filename' на Яндекс Диск");
 
             try {
                 $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
-                echo "Файл '$filename' успешно отправлен на Яндекс Диск." . PHP_EOL;
+
+                $logger->info("Файл '$filename' успешно отправлен на Яндекс Диск.");
 
                 // Записываем информацию о файле в базу данных
                 $sent_date = date('Y-m-d H:i:s');
                 $db->insertFile($filename, $sent_date);
             } catch (Exception $e) {
-                echo "Ошибка при отправке файла '$filename' на Яндекс Диск: ".$e->getMessage(). PHP_EOL;
+                $logger->error("Ошибка при отправке файла '$filename' на Яндекс Диск: ". $e->getMessage());
             }
         } else {
-            echo "Файл '$filename' уже отправлен на Яндекс Диск, пропускаем." . PHP_EOL;
+            $logger->error("Файл '$filename' уже отправлен на Яндекс Диск, пропускаем.");
         }
     }
 } else {
-    echo "Файлы с маской '$fileMask' не найдены в папке '$backupFolder'." . PHP_EOL;
+    $logger->error("Файлы с маской '$fileMask' не найдены в папке '$backupFolder'.");
 }
 
 // Удаляем файлы, старше 7 дней с сервера, с sqlite и с Яндекс Диска
 foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
+
+    $logger->info("Есть файл '$filename', старше '$maximum_storage_day' дней, отправляем на удаление.");
 
     // Проверяем, есть ли файл на сервере
     $localFilePath = $backupFolder . '/' . $filename;
 
     if (file_exists($localFilePath)) {
         unlink($localFilePath); // Удаляем файл с сервера
-        echo "Файл '$filename' удален с сервера." . PHP_EOL;
+        $logger->info("Файл '$filename' удален с сервера." );
     }else{
-        echo "Файл '$filename' не может быть удалён, т.к. не найден." . PHP_EOL;
+        $logger->error("Файл '$filename' не может быть удалён, т.к. не найден.");
     }
 
     // Проверяем, есть ли файл на Яндекс Диске
@@ -115,7 +130,8 @@ foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
         $response = $client->request('HEAD', $remoteFilePath);
         if ($response['statusCode'] === 200) {
             $client->request('DELETE', $remoteFilePath); // Удаляем файл с Яндекс Диска
-            echo "Файл '$filename' удален с Яндекс Диска." . PHP_EOL;
+
+            $logger->info("Файл '$filename' удален с Яндекс Диска.");
         }
     } catch (Exception $e) {
         echo "Файл '$filename' не существует на Яндекс Диске." . PHP_EOL;

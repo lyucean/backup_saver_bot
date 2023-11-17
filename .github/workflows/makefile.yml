@@ -24,6 +24,8 @@ jobs:
           echo "WEBDAV_SERVER=${{ secrets.WEBDAV_SERVER }}" >> .env
           echo "WEBDAV_USERNAME=${{ secrets.WEBDAV_USERNAME }}" >> .env
           echo "WEBDAV_PASSWORD=${{ secrets.WEBDAV_PASSWORD }}" >> .env
+          echo "SENTRY_DNS=${{ secrets.SENTRY_DNS }}" >> .env
+          echo "LOGTAIL_TOKEN=${{ secrets.LOGTAIL_TOKEN }}" >> .env
           
           echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}" >> .env
           echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env
