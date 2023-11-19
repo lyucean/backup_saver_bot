@@ -26,6 +26,7 @@ jobs:
           echo "WEBDAV_PASSWORD=${{ secrets.WEBDAV_PASSWORD }}" >> .env
           echo "SENTRY_DNS=${{ secrets.SENTRY_DNS }}" >> .env
           echo "LOGTAIL_TOKEN=${{ secrets.LOGTAIL_TOKEN }}" >> .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           
           echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}" >> .env
           echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env
@@ -34,6 +35,7 @@ jobs:
           echo "PERIOD_START_RUNNER=${{ vars.PERIOD_START_RUNNER }}" >> .env
           echo "PERIOD_START_MAIN=${{ vars.PERIOD_START_MAIN }}" >> .env
           echo "FILE_MASK=${{ vars.FILE_MASK }}" >> .env
+          echo "TELEGRAM_CHAT_ID=${{ vars.TELEGRAM_CHAT_ID }}" >> .env
 
       - name: "Создадим каталог проекта"
         uses: appleboy/ssh-action@master
@@ -87,8 +89,8 @@ jobs:
       - name: "Отправить телеграмму по push-уведомлению"
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+          token: ${{ vars.TELEGRAM_ALERT_TOKEN }}
           message: |
             ${{ github.actor }} создал commit:
             Commit: ${{ github.event.commits[0].message }}
