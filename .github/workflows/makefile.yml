@@ -75,10 +75,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ vars.PROJECT_PATH }}
-            make docker-pull                    
-            make docker-build                    
-            make docker-up                    
-            make composer-install       
+            make init   
 
   alert:
     name: "Уведомление"
