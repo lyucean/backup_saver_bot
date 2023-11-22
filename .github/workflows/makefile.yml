@@ -89,8 +89,8 @@ jobs:
       - name: "Отправить телеграмму по push-уведомлению"
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
-          token: ${{ vars.TELEGRAM_ALERT_TOKEN }}
+          to: ${{ vars.TELEGRAM_ALERT_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_ALERT_TOKEN }}
           message: |
             ${{ github.actor }} создал commit:
             Commit: ${{ github.event.commits[0].message }}
