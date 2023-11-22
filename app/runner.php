@@ -9,7 +9,7 @@ $dotenv->required('ENVIRONMENT')->notEmpty();
 
 $log_file = 'logs/runner.log'; // Где будем хранить логи работы runner
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
-$period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько минут будет перезапускаться runner.php
+$period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько секунд будет перезапускаться runner.php
 $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
 date_default_timezone_set('Europe/Moscow'); // московский регион
@@ -35,28 +35,26 @@ if (count($logContents) >= 2000) {
     file_put_contents($log_file, implode('', $logContents));
 }
 
+// Засекаем время до выполнения скрипта
+$startTime = time();
+
 // Бесконечный цикл, который будет вызывать основной файл скрипта
 while (true) {
-    // Засекаем время до выполнения скрипта
-    $startTime = microtime(true);
 
     // Выполняем целевой скрипт и сохраняем вывод в переменную
     $command = "php $targetScript";
     $output = [];
     exec($command, $output);
 
-    // Засекаем время после выполнения скрипта и вычисляем разницу в миллисекундах
-    $executionTimeMs = (microtime(true) - $startTime) * 1000;
-
     // Записываем вывод и время выполнения в лог файл
-    $logMessage = date('Y-m-d H:i:s') . " : Время выполнения: " . number_format($executionTimeMs, 2) . " ms\n";
+    $logMessage = date('Y-m-d H:i:s') . " : Время выполнения: " . number_format((microtime(true) - $startTime) * 1000, 2) . " ms\n";
     $logMessage .= '    ' . implode("\n", $output) . PHP_EOL;
     file_put_contents($log_file, $logMessage, FILE_APPEND);
 
     sleep($period_main); // Задержка в секундах перед каждой итерацией цикла
 
     // Проверяем, если скрипт работает больше нужного, перезапустим его
-    if (time() - $_SERVER['REQUEST_TIME'] >= $period_runner) {
+    if ((time() - $startTime) >= $period_runner) {
         exec('php ' . __FILE__ . ' >> ' . $log_file . ' 2>&1 &'); // Запускаем новый экземпляр скрипта
         exit(); // Завершаем текущий экземпляр скрипта
     }
