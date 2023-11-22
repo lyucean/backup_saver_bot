@@ -78,11 +78,11 @@ if (!empty($localFiles)) {
                 $logger->error("Ошибка при отправке файла '$filename' на Яндекс Диск: ". $e->getMessage());
             }
         } else {
-            $logger->error("Файл '$filename' уже отправлен на Яндекс Диск, пропускаем.");
+            $logger->warning("Файл '$filename' уже отправлен на Яндекс Диск, пропускаем.");
         }
     }
 } else {
-    $logger->error("Файлы с маской '$fileMask' не найдены в папке '$backupFolder'.");
+    $logger->warning("Файлы с маской '$fileMask' не найдены в папке '$backupFolder'.");
 }
 
 // Удаляем файлы, старше 7 дней с сервера, с sqlite и с Яндекс Диска
@@ -110,11 +110,11 @@ foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
             $logger->info("Файл '$filename' удален с Яндекс Диска.");
         }
     } catch (Exception $e) {
-        echo "Файл '$filename' не существует на Яндекс Диске." . PHP_EOL;
+        $logger->error("Файл '$filename' не существует на Яндекс Диске.");
     }
 
     $db->markFileAsDeleted($filename); // Помечаем файл как удаленный в базе данных
-    echo "Запись о файле '$filename' помечена как удаленная в базе данных." . PHP_EOL;
+    $logger->info("Запись о файле '$filename' помечена как удаленная в базе данных.");
 }
 
 $db->close(); // Закрываем соединение с базой данных
