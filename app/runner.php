@@ -18,7 +18,9 @@ date_default_timezone_set('Europe/Moscow'); // московский регион
 if (!empty($_ENV['SENTRY_DNS'])) {
     \Sentry\init([
       'dsn' => $_ENV['SENTRY_DNS'],
-      'environment' => $_ENV['ENVIRONMENT']
+      'release' => date("Y-m-d_H.i", filectime(__FILE__)), //тест релиза
+      'environment' => $_ENV['ENVIRONMENT'],
+      'traces_sample_rate' => 0.2,
     ]);
 }
 
