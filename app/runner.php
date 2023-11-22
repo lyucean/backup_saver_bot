@@ -7,6 +7,12 @@ $dotenv->required('PERIOD_START_RUNNER')->notEmpty();
 $dotenv->required('PERIOD_START_MAIN')->notEmpty();
 $dotenv->required('ENVIRONMENT')->notEmpty();
 
+if($_ENV['ENVIRONMENT'] == 'developer'){
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
+
 $log_file = 'logs/runner.log'; // Где будем хранить логи работы runner
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
 $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько секунд будет перезапускаться runner.php

@@ -20,6 +20,12 @@ $dotenv->required('BACKUPS_FOLDER')->notEmpty();
 $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
 $dotenv->required('PERIOD_START_MAIN')->notEmpty();
 
+if($_ENV['ENVIRONMENT'] == 'developer'){
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
+
 set_time_limit($_ENV['PERIOD_START_MAIN'] - 1); // Убиваем MAIN скрипт, если он завис и пришло время запуска нового
 
 // Копим логи ошибок в Sentry
