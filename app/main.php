@@ -118,3 +118,10 @@ foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
 }
 
 $db->close(); // Закрываем соединение с базой данных
+
+$logger->notice("Завершение Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT']);
+
+echo "Завершение Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT'];
+
+exit;
+
