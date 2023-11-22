@@ -38,6 +38,11 @@ if (count($logContents) >= 2000) {
 // Засекаем время до выполнения скрипта
 $startTime = time();
 
+// Получаем ID текущего процесса
+$pid = getmypid();
+
+$logMessage = date('Y-m-d H:i:s') . " Запуск Runner - '$pid' " . PHP_EOL;
+
 // Бесконечный цикл, который будет вызывать основной файл скрипта
 while (true) {
 
@@ -47,7 +52,8 @@ while (true) {
     exec($command, $output);
 
     // Записываем вывод и время выполнения в лог файл
-    $logMessage = date('Y-m-d H:i:s') . " : Время выполнения: " . number_format((microtime(true) - $startTime) * 1000, 2) . " ms\n";
+    $logMessage .= date('Y-m-d H:i:s')
+                . " : Время выполнения: " . number_format((microtime(true) - $startTime) * 1000, 2) . " ms" . PHP_EOL;
     $logMessage .= '    ' . implode("\n", $output) . PHP_EOL;
     file_put_contents($log_file, $logMessage, FILE_APPEND);
 
@@ -56,6 +62,7 @@ while (true) {
     // Проверяем, если скрипт работает больше нужного, перезапустим его
     if ((time() - $startTime) >= $period_runner) {
         exec('php ' . __FILE__ . ' >> ' . $log_file . ' 2>&1 &'); // Запускаем новый экземпляр скрипта
-        exit(); // Завершаем текущий экземпляр скрипта
+        exec("kill -9 $pid"); // Завершаем предыдущий процесс, на всякий случай, если он завис.
+        exit(); // Завершаем текущий экземпляр скрипта.
     }
 }
