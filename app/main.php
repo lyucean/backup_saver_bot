@@ -72,12 +72,12 @@ if (!empty($localFiles)) {
     foreach ($localFiles as $localFile) {
         $filename = basename($localFile); // Имя файла без пути
 
-        if (!$db->fileExists($filename)) {
-            $logger->warning("Файл '$filename' уже отправлен на Яндекс Диск, пропускаем.");
+        if ($db->fileExists($filename)) {
+            $logger->warning("Файл '$filename' уже есть в БД, пропускаем.");
+            continue; // пропускаем текущую итерацию
         }
 
         $logger->info("Проверим что файла нет '$filename' на Яндекс Диск");
-
         try {
             // Попытка выполнить запрос HEAD для проверки файла
             $response = $client->request('HEAD', '/'.$webdav_folder.'/'.$filename);
@@ -85,6 +85,11 @@ if (!empty($localFiles)) {
             // Проверяем статус ответа, чтобы увидеть, существует ли файл
             if ($response['statusCode'] == 200) {
                 $logger->warning("Файл $filename уже существует на Яндекс Диск");
+
+                // Записываем информацию о файле в базу данных
+                $formattedCreationTime = date('Y-m-d H:i:s', filectime($localFile)); // Получение времени создания файла
+                $db->insertFile($filename, $formattedCreationTime);
+
                 continue; // пропускаем текущую итерацию
             } elseif ($response['statusCode'] == 404) {
                 $logger->info("Файл $filename не найден на Яндекс Диск, можно начать загрузку.");
@@ -104,8 +109,8 @@ if (!empty($localFiles)) {
             $logger->info("Файл '$filename' успешно отправлен на Яндекс Диск.");
 
             // Записываем информацию о файле в базу данных
-            $sent_date = date('Y-m-d H:i:s');
-            $db->insertFile($filename, $sent_date);
+            $formattedCreationTime = date('Y-m-d H:i:s', filectime($localFile)); // Получение времени создания файла
+            $db->insertFile($filename, $formattedCreationTime);
 
             break; // Отправка данных происходит очень долго, поэтому следующий отправим в новом цикле.
         } catch (Exception $e) {
