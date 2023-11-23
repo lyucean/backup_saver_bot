@@ -77,6 +77,24 @@ jobs:
             cd ${{ vars.PROJECT_PATH }}
             make init   
 
+  log:
+    name: "Уведомление"
+    runs-on: ubuntu-latest
+    needs: [ deploy ]
+    environment: production  # использовать среду "production"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: "Сообщение о новом релизе логи в Better Stack"
+        run: |
+          curl -X POST \
+          -H 'Content-Type: application/json' \
+          -H 'Authorization: Bearer ${{ secrets.LOGTAIL_TOKEN }}' \
+          -d "{\"dt\":\"$(date -u +'%Y-%m-%d %T UTC')\",\"message\":\"-------------- Новый релиз ---------------\"}" \
+          -k \
+          https://in.logs.betterstack.com
+
   alert:
     name: "Уведомление"
     runs-on: ubuntu-latest
