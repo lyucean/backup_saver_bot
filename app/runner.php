@@ -13,6 +13,16 @@ if($_ENV['ENVIRONMENT'] == 'developer'){
     error_reporting(E_ALL);
 }
 
+// Копим логи ошибок в Sentry
+if (!empty($_ENV['SENTRY_DNS'])) {
+    \Sentry\init([
+      'dsn' => $_ENV['SENTRY_DNS'],
+      'release' => date("Y-m-d_H.i", filectime(__FILE__)), //тест релиза
+      'environment' => $_ENV['ENVIRONMENT'],
+      'traces_sample_rate' => 0.2,
+    ]);
+}
+
 $log_file = 'logs/runner.log'; // Где будем хранить логи работы runner
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
 $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько секунд будет перезапускаться runner.php
