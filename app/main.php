@@ -28,6 +28,14 @@ if($_ENV['ENVIRONMENT'] == 'developer'){
 
 set_time_limit($_ENV['PERIOD_START_MAIN'] - 1); // Убиваем MAIN скрипт, если он завис и пришло время запуска нового
 
+function myShutdownFunction(): void
+{
+    global $logger;
+    $logger->notice("Завершение Main - " . getmypid() . " в окружении: " . $_ENV['ENVIRONMENT']);
+}
+
+register_shutdown_function('myShutdownFunction'); // Пишем лог о завершении
+
 // Копим логи ошибок в Sentry
 if (!empty($_ENV['SENTRY_DNS'])) {
     \Sentry\init([
@@ -145,10 +153,6 @@ foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
 }
 
 $db->close(); // Закрываем соединение с базой данных
-
-$logger->notice("Завершение Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT']);
-
-echo "Завершение Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT'];
 
 exit;
 
