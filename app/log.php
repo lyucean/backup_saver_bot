@@ -10,7 +10,7 @@ class CustomLogger {
 
     public function __construct() {
         // Определяем, используем ли мы Logtail или логирование в файл
-        $this->useLogtail = $_ENV['ENVIRONMENT'] === "production" && isset($_ENV['LOGTAIL_TOKEN']);
+        $this->useLogtail = isset($_ENV['LOGTAIL_TOKEN']);
 
         if ($this->useLogtail) {
             $this->logger = new Logger("bsb");
