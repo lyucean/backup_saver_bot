@@ -2,9 +2,7 @@
 
 require_once('vendor/autoload.php');
 require_once('db.php');
-
-use Monolog\Logger;
-use Logtail\Monolog\LogtailHandler;
+require_once('log.php');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -47,8 +45,7 @@ function myShutdownFunction(): void
 register_shutdown_function('myShutdownFunction'); // Пишем лог о завершении
 
 // Подключим класс логов
-$logger = new Logger("bsb");
-$logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
+$logger = new CustomLogger();
 $logger->notice("Запуск Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT']);
 
 // Создаем клиент WebDAV

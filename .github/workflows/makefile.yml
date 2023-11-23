@@ -36,6 +36,7 @@ jobs:
           echo "PERIOD_START_MAIN=${{ vars.PERIOD_START_MAIN }}" >> .env
           echo "FILE_MASK=${{ vars.FILE_MASK }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ vars.TELEGRAM_CHAT_ID }}" >> .env
+          echo "LOG_FILE=${{ vars.LOG_FILE }}" >> .env
 
       - name: "Создадим каталог проекта"
         uses: appleboy/ssh-action@master

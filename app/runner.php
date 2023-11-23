@@ -6,6 +6,7 @@ $dotenv->load();
 $dotenv->required('PERIOD_START_RUNNER')->notEmpty();
 $dotenv->required('PERIOD_START_MAIN')->notEmpty();
 $dotenv->required('ENVIRONMENT')->notEmpty();
+$dotenv->required('LOG_FILE')->notEmpty();
 
 if($_ENV['ENVIRONMENT'] == 'developer'){
     ini_set('display_errors', 1);
@@ -23,7 +24,7 @@ if (!empty($_ENV['SENTRY_DNS'])) {
     ]);
 }
 
-$log_file = 'logs/runner.log'; // Где будем хранить логи работы runner
+$log_file = $_ENV['LOG_FILE']; // Где будем хранить логи работы runner
 $targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
 $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько секунд будет перезапускаться runner.php
 $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
@@ -65,7 +66,7 @@ while (true) {
     // Проверяем, если прошло достаточно времени для запуска целевого скрипта
     if ((time() - $startRunnerTime) % $period_main == 0) {
         $log("Запуск целевого скрипта");
-        exec("php $targetScript");
+        exec("php $targetScript > /dev/null 2>&1 &");
     }
 
     $log("Осталось: " . ($period_runner - (time() - $startRunnerTime)) . " сек.");
