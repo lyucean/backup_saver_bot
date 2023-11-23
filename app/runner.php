@@ -20,16 +20,6 @@ $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько мин�
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
 date_default_timezone_set('Europe/Moscow'); // московский регион
 
-// Копим логи ошибок в Sentry
-if (!empty($_ENV['SENTRY_DNS'])) {
-    \Sentry\init([
-      'dsn' => $_ENV['SENTRY_DNS'],
-      'release' => date("Y-m-d_H.i", filectime(__FILE__)), //тест релиза
-      'environment' => $_ENV['ENVIRONMENT'],
-      'traces_sample_rate' => 0.2,
-    ]);
-}
-
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($log_file)) {
     touch($log_file);

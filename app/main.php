@@ -26,6 +26,16 @@ if($_ENV['ENVIRONMENT'] == 'developer'){
     error_reporting(E_ALL);
 }
 
+// Копим логи ошибок в Sentry
+if (!empty($_ENV['SENTRY_DNS'])) {
+    \Sentry\init([
+      'dsn' => $_ENV['SENTRY_DNS'],
+      'release' => date("Y-m-d_H.i", filectime(__FILE__)), //тест релиза
+      'environment' => $_ENV['ENVIRONMENT'],
+      'traces_sample_rate' => 0.2,
+    ]);
+}
+
 set_time_limit($_ENV['PERIOD_START_MAIN'] - 1); // Убиваем MAIN скрипт, если он завис и пришло время запуска нового
 
 function myShutdownFunction(): void
@@ -35,15 +45,6 @@ function myShutdownFunction(): void
 }
 
 register_shutdown_function('myShutdownFunction'); // Пишем лог о завершении
-
-// Копим логи ошибок в Sentry
-if (!empty($_ENV['SENTRY_DNS'])) {
-    \Sentry\init([
-      'dsn' => $_ENV['SENTRY_DNS'],
-      'environment' => $_ENV['ENVIRONMENT'],
-      'release' =>  'bsb@' . date("Y-m-d_H.i", filectime(__FILE__))
-    ]);
-}
 
 // Подключим класс логов
 $logger = new Logger("bsb");
