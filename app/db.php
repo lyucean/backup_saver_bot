@@ -12,8 +12,7 @@ class SQLite {
     private function connect(): SQLite3
     {
         $dbPath = 'sqlite/db_bsb.db'; // Путь к базе данных SQLite
-        $db = new SQLite3($dbPath);
-        return $db;
+        return new SQLite3($dbPath);
     }
 
     public function close(): void
@@ -41,11 +40,13 @@ class SQLite {
     // Метод для проверки существования записи об отправке
     public function fileExists($filename): bool
     {
-        $query = "SELECT COUNT(*) FROM sent_files WHERE filename = :filename";
+        $query = "SELECT EXISTS(SELECT 1 FROM sent_files WHERE filename = :filename) as file_exists";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
-        $result = $stmt->execute()->fetchArray(SQLITE3_NUM);
-        return $result[0] > 0;
+
+        $result = $stmt->execute();
+        $row = $result->fetchArray(SQLITE3_ASSOC);
+        return $row['file_exists'] == 1;
     }
 
     // Метод получения старых записей
