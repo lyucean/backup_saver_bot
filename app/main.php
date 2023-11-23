@@ -87,13 +87,13 @@ if (!empty($localFiles)) {
 
             // Проверяем статус ответа, чтобы увидеть, существует ли файл
             if ($response['statusCode'] == 200) {
-                $logger->warning("Файл $filename уже существует на сервере");
+                $logger->warning("Файл $filename уже существует на Яндекс Диск");
                 continue; // пропускаем текущую итерацию
             } elseif ($response['statusCode'] == 404) {
-                $logger->info("Файл $filename не найден, можно начать загрузку.");
+                $logger->info("Файл $filename не найден на Яндекс Диск, можно начать загрузку.");
             } else {
                 // Другой ответ, возможно, требуется обработка ошибок
-                $logger->error("Не удалось проверить файл: HTTP статус ".$response['statusCode']);
+                $logger->error("Не удалось проверить файл на Яндекс Диск: HTTP статус ".$response['statusCode']);
             }
         } catch (Exception $e) {
             $logger->error("Ошибка при проверки файла '$filename' на Яндекс Диске: ".$e->getMessage());
