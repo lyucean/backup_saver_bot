@@ -67,13 +67,12 @@ $fileMask = $_ENV['FILE_MASK']; // Маска для поиска файлов �
 $localFiles = glob($backupFolder . '/' . $fileMask);
 
 if (!empty($localFiles)) {
-    $logger->info("Файлы найдены", $localFiles);
 
     foreach ($localFiles as $localFile) {
         $filename = basename($localFile); // Имя файла без пути
 
         if ($db->fileExists($filename)) {
-            $logger->warning("Файл '$filename' уже есть в БД, пропускаем.");
+            $logger->info("Файл '$filename' уже есть в БД, пропускаем.");
             continue; // пропускаем текущую итерацию
         }
 
