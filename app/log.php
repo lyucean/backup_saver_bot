@@ -7,10 +7,13 @@ class CustomLogger {
     private Logger $logger;
     private mixed $log_file;
     private bool $useLogtail;
+    private int $pid;
 
-    public function __construct() {
+    public function __construct(int $pid) {
         // Определяем, используем ли мы Logtail или логирование в файл
         $this->useLogtail = isset($_ENV['LOGTAIL_TOKEN']);
+
+        $this->pid = $pid;
 
         if ($this->useLogtail) {
             $this->logger = new Logger("bsb");
@@ -39,10 +42,12 @@ class CustomLogger {
     private function log($level, $message): void {
         if ($this->useLogtail) {
             // Используем Monolog для отправки сообщений в Logtail
-            $this->logger->{$level}($message);
+            $this->logger->{$level}($message,[
+              'pid' => $this->pid
+            ]);
         } else {
             // Или записываем логи в файл
-            $logMessage = date('Y-m-d H:i:s') . " [$level] $message" . PHP_EOL;
+            $logMessage = date('Y-m-d H:i:s') . " | $this->pid | " . " [$level] $message" . PHP_EOL;
             error_log($logMessage, 3, $this->log_file);
         }
     }

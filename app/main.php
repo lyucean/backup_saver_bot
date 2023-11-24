@@ -45,8 +45,8 @@ function myShutdownFunction(): void
 register_shutdown_function('myShutdownFunction'); // Пишем лог о завершении
 
 // Подключим класс логов
-$logger = new CustomLogger();
-$logger->notice("Запуск Main - " . getmypid() . ", в окружении: " . $_ENV['ENVIRONMENT']);
+$logger = new CustomLogger(getmypid());
+$logger->notice("Запуск Main в окружении: " . $_ENV['ENVIRONMENT']);
 
 // Создаем клиент WebDAV
 $client = new Sabre\DAV\Client([
