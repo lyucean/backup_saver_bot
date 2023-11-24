@@ -47,7 +47,7 @@ class CustomLogger {
             ]);
         } else {
             // Или записываем логи в файл
-            $logMessage = date('Y-m-d H:i:s') . " | $this->pid | " . " [$level] $message" . PHP_EOL;
+            $logMessage = date('Y-m-d H:i:s') . "|$this->pid|" . " [$level] $message" . PHP_EOL;
             error_log($logMessage, 3, $this->log_file);
         }
     }
