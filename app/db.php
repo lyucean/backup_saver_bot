@@ -24,16 +24,7 @@ class SQLite {
 
     public function init(): void
     {
-        // Создание таблицы для хранения файлов, загруженных файлов
         $query = "CREATE TABLE IF NOT EXISTS sent_files (filename TEXT, sent_date DATETIME)";
-        $this->db->exec($query);
-        // Создание таблицы для хранения файлов, поставленных на загрузку
-        $query = "CREATE TABLE IF NOT EXISTS deployed_files (
-                        id INTEGER PRIMARY KEY,
-                        filename TEXT,
-                        deploy_time DATETIME,
-                        pid INTEGER
-                    );";
         $this->db->exec($query);
     }
 
@@ -79,42 +70,6 @@ class SQLite {
     public function markFileAsDeleted($filename): void
     {
         $query = "DELETE FROM sent_files WHERE filename = :filename";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
-        $stmt->execute();
-    }
-
-    public function markFileAsDownloadable($filename): void
-    {
-        $query = "INSERT INTO deployed_files (filename, deploy_time) VALUES (:filename, DATETIME('now'))";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
-        $stmt->execute();
-    }
-
-    public function checkFileAsDownloadable($filename, $max_time) {
-        // Получение текущего времени
-        $currentTime = time();
-
-        // Подготовка запроса
-        $stmt = $this->db->prepare('SELECT COUNT(*) FROM deployed_files WHERE filename = :filename AND (:currentTime - strftime("%s", deploy_time)) <= :max_time');
-
-        // Привязка параметров и выполнение запроса
-        $stmt->bindValue(':filename', $filename, SQLITE3_TEXT);
-        $stmt->bindValue(':currentTime', $currentTime, SQLITE3_INTEGER);
-        $stmt->bindValue(':numSeconds', $max_time, SQLITE3_INTEGER);
-        $result = $stmt->execute();
-
-        // Извлечение результата
-        $count = $result->fetchArray(SQLITE3_NUM)[0];
-
-        // Возвращение true, если запись существует, в противном случае - false
-        return ($count > 0);
-    }
-
-    public function unMarkFileAsDownloadable($filename): void
-    {
-        $query = "DELETE FROM deployed_files WHERE filename = :filename";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
         $stmt->execute();
