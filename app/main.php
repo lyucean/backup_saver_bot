@@ -90,8 +90,8 @@ if (!empty($localFiles)) {
                 $db->insertFile($filename, $formattedCreationTime);
 
                 continue; // пропускаем текущую итерацию
-            } elseif ($db->checkFileAsDownloadable($filename, $_ENV['PERIOD_START_MAIN'])) {
-                $logger->info("Файл $filename уже в загрузке на Яндекс Диск");
+//            } elseif ($db->checkFileAsDownloadable($filename, $_ENV['PERIOD_START_MAIN'])) {
+//                $logger->info("Файл $filename уже в загрузке на Яндекс Диск");
                 continue; // пропускаем текущую итерацию
             } elseif ($response['statusCode'] == 404) {
                 $logger->info("Файл $filename не найден на Яндекс Диск, можно начать загрузку.");
@@ -107,11 +107,11 @@ if (!empty($localFiles)) {
 
         try {
 
-            $db->markFileAsDownloadable($filename); // пометим файл как загружаемый
+//            $db->markFileAsDownloadable($filename); // пометим файл как загружаемый
 
             $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
 
-            $db->unMarkFileAsDownloadable($filename); // пометим файл как Загруженный
+//            $db->unMarkFileAsDownloadable($filename); // пометим файл как Загруженный
 
             $logger->info("Файл '$filename' успешно отправлен на Яндекс Диск.");
 
