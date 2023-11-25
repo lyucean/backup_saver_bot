@@ -18,7 +18,7 @@ $dotenv->required('BACKUPS_FOLDER')->notEmpty();
 $dotenv->required('MAXIMUM_STORAGE_DAY')->notEmpty();
 $dotenv->required('PERIOD_START_MAIN')->notEmpty();
 
-if($_ENV['ENVIRONMENT'] == 'developer'){
+if ($_ENV['ENVIRONMENT'] == 'developer') {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -39,14 +39,14 @@ set_time_limit($_ENV['PERIOD_START_MAIN'] - 1); // Убиваем MAIN скри�
 function myShutdownFunction(): void
 {
     global $logger;
-    $logger->notice("Завершение Main - " . getmypid() . " в окружении: " . $_ENV['ENVIRONMENT']);
+    $logger->notice("Завершение Main - ".getmypid()." в окружении: ".$_ENV['ENVIRONMENT']);
 }
 
 register_shutdown_function('myShutdownFunction'); // Пишем лог о завершении
 
 // Подключим класс логов
 $logger = new CustomLogger(getmypid());
-$logger->notice("Запуск Main в окружении: " . $_ENV['ENVIRONMENT']);
+$logger->notice("Запуск Main в окружении: ".$_ENV['ENVIRONMENT']);
 
 // Создаем клиент WebDAV
 $client = new Sabre\DAV\Client([
@@ -64,10 +64,9 @@ $backupFolder = 'backups'; // Папка, в которой хранятся б�
 $fileMask = $_ENV['FILE_MASK']; // Маска для поиска файлов бекапа
 
 // Получаем список файлов в папке backups
-$localFiles = glob($backupFolder . '/' . $fileMask);
+$localFiles = glob($backupFolder.'/'.$fileMask);
 
 if (!empty($localFiles)) {
-
     foreach ($localFiles as $localFile) {
         $filename = basename($localFile); // Имя файла без пути
 
@@ -106,7 +105,6 @@ if (!empty($localFiles)) {
         $logger->info("Отправляем '$filename' на Яндекс Диск");
 
         try {
-
             $db->markFileAsDownloadable($filename); // пометим файл как загружаемый
 
             $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
@@ -129,22 +127,21 @@ if (!empty($localFiles)) {
 }
 
 // Удаляем файлы, старше 7 дней с сервера, с sqlite и с Яндекс Диска
-foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
-
+foreach ($db->getOldFiles($maximum_storage_day) as $filename) {
     $logger->info("Есть файл '$filename', старше '$maximum_storage_day' дней, отправляем на удаление.");
 
     // Проверяем, есть ли файл на сервере
-    $localFilePath = $backupFolder . '/' . $filename;
+    $localFilePath = $backupFolder.'/'.$filename;
 
     if (file_exists($localFilePath)) {
         unlink($localFilePath); // Удаляем файл с сервера
-        $logger->info("Файл '$filename' удален с сервера." );
-    }else{
+        $logger->info("Файл '$filename' удален с сервера.");
+    } else {
         $logger->error("Файл '$filename' не может быть удалён, т.к. не найден.");
     }
 
     // Проверяем, есть ли файл на Яндекс Диске
-    $remoteFilePath = '/' . $webdav_folder . '/' . $filename;
+    $remoteFilePath = '/'.$webdav_folder.'/'.$filename;
     try {
         $response = $client->request('HEAD', $remoteFilePath);
         if ($response['statusCode'] === 200) {

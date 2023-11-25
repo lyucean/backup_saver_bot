@@ -1,9 +1,11 @@
 <?php
 
-class SQLite {
+class SQLite
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = $this->connect();
 
         $this->init(); // Создадим таблицы, если их нет
@@ -49,7 +51,7 @@ class SQLite {
     // Метод для проверки существования записи об отправке
     public function fileExists($filename): bool
     {
-        $query = "SELECT EXISTS(SELECT 1 FROM sent_files WHERE filename = :filename) as file_exists";
+        $query = "SELECT EXISTS(SELECT 1 FROM sent_files WHERE filename = :filename) AS file_exists";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
 
@@ -61,7 +63,7 @@ class SQLite {
     // Метод получения старых записей
     public function getOldFiles($maximum_storage_day): array
     {
-        $dateThreshold = date('Y-m-d', strtotime('-' . $maximum_storage_day . ' days'));
+        $dateThreshold = date('Y-m-d', strtotime('-'.$maximum_storage_day.' days'));
 
         $query = "SELECT filename FROM sent_files WHERE sent_date < :date";
         $stmt = $this->db->prepare($query);
@@ -86,18 +88,21 @@ class SQLite {
 
     public function markFileAsDownloadable($filename): void
     {
-        $query = "INSERT INTO deployed_files (filename, deploy_time) VALUES (:filename, DATETIME('now'))";
+        $query = "INSERT INTO deployed_files (filename, deploy_time) VALUES (:filename, datetime('now'))";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':filename', $filename, SQLITE3_TEXT);
         $stmt->execute();
     }
 
-    public function checkFileAsDownloadable($filename, $max_time) {
+    public function checkFileAsDownloadable($filename, $max_time)
+    {
         // Получение текущего времени
         $currentTime = time();
 
         // Подготовка запроса
-        $stmt = $this->db->prepare('SELECT COUNT(*) FROM deployed_files WHERE filename = :filename AND (:currentTime - strftime("%s", deploy_time)) <= :max_time');
+        $stmt = $this->db->prepare(
+          'SELECT COUNT(*) FROM deployed_files WHERE filename = :filename AND (:currentTime - strftime("%s", deploy_time)) <= :max_time'
+        );
 
         // Привязка параметров и выполнение запроса
         $stmt->bindValue(':filename', $filename, SQLITE3_TEXT);
