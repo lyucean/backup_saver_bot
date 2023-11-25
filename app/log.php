@@ -16,7 +16,7 @@ class CustomLogger {
         $this->pid = $pid;
 
         if ($this->useLogtail) {
-            $this->logger = new Logger("bsb");
+            $this->logger = new Logger($this->pid);
             $this->logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
         }
 
