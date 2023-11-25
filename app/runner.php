@@ -1,4 +1,5 @@
 <?php
+
 require_once('vendor/autoload.php');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -8,7 +9,7 @@ $dotenv->required('PERIOD_START_MAIN')->notEmpty();
 $dotenv->required('ENVIRONMENT')->notEmpty();
 $dotenv->required('LOG_FILE')->notEmpty();
 
-if($_ENV['ENVIRONMENT'] == 'developer'){
+if ($_ENV['ENVIRONMENT'] == 'developer') {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
@@ -25,7 +26,7 @@ if (!empty($_ENV['SENTRY_DNS'])) {
 }
 
 $log_file = $_ENV['LOG_FILE']; // Где будем хранить логи работы runner
-$targetScript = dirname(__FILE__) . '/main.php'; // Путь к целевому скрипту
+$targetScript = dirname(__FILE__).'/main.php'; // Путь к целевому скрипту
 $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько секунд будет перезапускаться runner.php
 $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
@@ -49,7 +50,7 @@ $pid = getmypid();
 
 // Функция логов
 $log = function ($logMessage) use ($log_file, $pid) {
-    file_put_contents($log_file, date('Y-m-d H:i:s') . " - $pid: " . $logMessage . PHP_EOL, FILE_APPEND);
+    file_put_contents($log_file, date('Y-m-d H:i:s')." - $pid: ".$logMessage.PHP_EOL, FILE_APPEND);
 };
 
 $log("Старт Runner");
@@ -69,9 +70,9 @@ while (true) {
         exec("php $targetScript > /dev/null 2>&1 &");
     }
 
-    $log("Осталось: " . ($period_runner - (time() - $startRunnerTime)) . " сек.");
+    $log("Осталось: ".($period_runner - (time() - $startRunnerTime))." сек.");
     sleep(1); // Отмеряем секунды.
 }
 
-exec('php ' . __FILE__ . ' >> ' . $log_file . ' 2>&1 &'); // Запускаем новый экземпляр скрипта
+exec('php '.__FILE__.' >> '.$log_file.' 2>&1 &'); // Запускаем новый экземпляр скрипта
 exit(); // Завершаем текущий экземпляр скрипта.
