@@ -24,8 +24,17 @@ class SQLite {
 
     public function init(): void
     {
+        // Создание таблицы для хранения файлов, загруженных файлов
         $query = "CREATE TABLE IF NOT EXISTS sent_files (filename TEXT, sent_date DATETIME)";
         $this->db->exec($query);
+        // Создание таблицы для хранения файлов, поставленных на загрузку
+//        $query = "CREATE TABLE IF NOT EXISTS deployed_files (
+//                        id INTEGER PRIMARY KEY,
+//                        filename TEXT,
+//                        deploy_time DATETIME,
+//                        pid INTEGER
+//                    );";
+//        $this->db->exec($query);
     }
 
     public function insertFile($filename, $sent_date): void
