@@ -144,14 +144,14 @@ foreach  ($db->getOldFiles($maximum_storage_day) as $filename) {
 
             $logger->info("Файл '$filename' удален с Яндекс Диска.");
 
-            $db->markFileAsDeleted($filename); // Помечаем файл как удаленный в базе данных
-            $logger->info("Запись о файле '$filename' помечена как удаленная в базе данных.");
-
             break; // Отправка данных происходит очень долго, поэтому следующий отправим в новом цикле.
         }
     } catch (Exception $e) {
         $logger->error("Файл '$filename' не существует на Яндекс Диске.");
     }
+
+    $db->markFileAsDeleted($filename); // Помечаем файл как удаленный в базе данных
+    $logger->info("Запись о файле '$filename' помечена как удаленная в базе данных.");
 }
 
 $db->close(); // Закрываем соединение с базой данных
