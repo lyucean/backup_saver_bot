@@ -18,7 +18,7 @@ services:
   composer:
     container_name: BSB_composer
     profiles: ["main", "dev"]
-    image: composer
+    image: composer:2.6.5
     volumes:
       - ./app:/app
     working_dir: /app
