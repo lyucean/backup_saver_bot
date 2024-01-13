@@ -35,6 +35,7 @@ if (!empty($_ENV['SENTRY_DNS'])) {
 }
 
 set_time_limit($_ENV['PERIOD_START_MAIN'] - 1); // Убиваем MAIN скрипт, если он завис и пришло время запуска нового
+date_default_timezone_set('Europe/Moscow'); // московский регион
 
 function myShutdownFunction(): void
 {
