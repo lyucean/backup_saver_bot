@@ -47,15 +47,15 @@ class CustomLogger
 
     private function log($level, $message): void
     {
-        if ($this->useLogtail) {
+//        if ($this->useLogtail) {
             // Используем Monolog для отправки сообщений в Logtail
             $this->logger->{$level}($message, [
               'pid' => $this->pid
             ]);
-        } else {
+//        } else {
             // Или записываем логи в файл
             $logMessage = date('Y-m-d H:i:s')."|$this->pid|"." [$level] $message".PHP_EOL;
             error_log($logMessage, 3, $this->log_file);
-        }
+//        }
     }
 }
