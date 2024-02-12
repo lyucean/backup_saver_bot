@@ -31,6 +31,8 @@ $period_runner = $_ENV['PERIOD_START_RUNNER']; // Раз во сколько с�
 $period_main = $_ENV['PERIOD_START_MAIN']; // Раз во сколько минут будет запускаться main.php
 set_time_limit(0); // Устанавливаем бесконечное время, т.к. мы будем сами его перезапускать.
 date_default_timezone_set('Europe/Moscow'); // московский регион
+$pid = getmypid(); // Получаем ID текущего процесса
+
 
 // Проверяем, существует ли файл логов, если нет - создадим
 if (!file_exists($log_file)) {
@@ -38,18 +40,19 @@ if (!file_exists($log_file)) {
     chmod($log_file, 0777); // поправим права
 }
 
-// Проверяем количество строк в файле и удаляем первые 1000 строк, если нужно
-$logContents = file($log_file);
-if (count($logContents) >= 2000) {
-    $logContents = array_slice($logContents, 1000);
-    file_put_contents($log_file, implode('', $logContents));
-}
-
-// Получаем ID текущего процесса
-$pid = getmypid();
-
-// Функция логов
+// Функция записи логов
 $log = function ($logMessage) use ($log_file, $pid) {
+
+    // Проверяем количество строк в файле и удаляем первые 1000 строк, если нужно
+    $logContents = file($log_file);
+    $totalLines = count($logContents);
+
+    if ($totalLines >= 1500) {
+        $logContents = array_slice($logContents, $totalLines - 1000); // Оставляем только последние 1000 строк
+        file_put_contents($log_file, implode('', $logContents));
+    }
+
+    // Дописываем нашу строку
     file_put_contents($log_file, date('Y-m-d H:i:s')." - $pid: ".$logMessage.PHP_EOL, FILE_APPEND);
 };
 
