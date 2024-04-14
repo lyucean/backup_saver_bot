@@ -17,7 +17,7 @@ services:
       - app_network
 
   composer:
-    restart: unless-stopped
+    restart: no
     container_name: BSB_composer
     profiles: ["main", "dev"]
     image: composer:2.6.5
