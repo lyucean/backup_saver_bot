@@ -58,22 +58,22 @@ class SQLite {
         return $row['file_exists'] == 1;
     }
 
-    // Метод получения старых записей
-    public function getOldFiles($maximum_storage_day): array
+    // Метод получения старой записи
+    public function getOldFile($maximum_storage_day): ?string
     {
         $dateThreshold = date('Y-m-d', strtotime('-' . $maximum_storage_day . ' days'));
 
-        $query = "SELECT filename FROM sent_files WHERE sent_date < :date";
+        $query = "SELECT filename FROM sent_files WHERE sent_date < :date LIMIT 1";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':date', $dateThreshold, SQLITE3_TEXT);
         $result = $stmt->execute();
 
-        $files = [];
-        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $files[] = $row['filename'];
+        $row = $result->fetchArray(SQLITE3_ASSOC);
+        if ($row) {
+            return $row['filename'];
+        } else {
+            return null;
         }
-
-        return $files;
     }
 
     public function markFileAsDeleted($filename): void
