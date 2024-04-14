@@ -65,7 +65,7 @@ while (true) {
     // отправим на сервер новые
     send_file();
 
-    sleep(360);
+    sleep($periodRun);
 }
 
 function send_file(): void
