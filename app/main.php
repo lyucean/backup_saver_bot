@@ -111,7 +111,9 @@ function send_file(): void
             $logger->info("Отправляем '$filename' на Яндекс Диск");
 
             try {
-                $client->request('PUT', '/'.$webdav_folder.'/'.$filename, file_get_contents($localFile));
+                $fp = fopen($localFile, 'r');
+                $client->request('PUT', '/'.$webdav_folder.'/'.$filename, $fp);
+                fclose($fp);
 
                 $logger->info("Файл '$filename' успешно отправлен на Яндекс Диск.");
 
