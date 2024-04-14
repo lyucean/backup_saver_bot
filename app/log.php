@@ -9,9 +9,13 @@ class Logs
 
     private function __construct()
     {
-        $logger = new Logger('BSB ' . $_ENV['ENVIRONMENT']); // Initialize Logger
-        $logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
-        self::$instance = $logger; // Store the Logger instance
+        $logger = new Logger('BSB ' . $_ENV['ENVIRONMENT']);
+        if ($_ENV['ENVIRONMENT'] === 'developer') {
+            $logger->pushHandler(new \Monolog\Handler\StreamHandler('php://output', Logger::INFO));
+        } else {
+            $logger->pushHandler(new LogtailHandler($_ENV['LOGTAIL_TOKEN']));
+        }
+        self::$instance = $logger;
     }
 
     public static function getInstance(): Logger

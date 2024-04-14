@@ -29,7 +29,7 @@ if (!empty($_ENV['SENTRY_DNS'])) {
       'traces_sample_rate' => 0.2,
     ]);
 }
-
+ini_set('memory_limit', '256M');
 date_default_timezone_set('Europe/Moscow'); // московский регион
 
 // Подключим класс логов
