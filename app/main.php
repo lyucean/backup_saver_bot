@@ -58,12 +58,11 @@ $periodRun= $_ENV['PERIOD_SECONDS_RUN']; // Время задержки межд
 
 // Бесконечный цикл, который будет вызывать основной файл скрипта
 while (true) {
+    // отправим на сервер новые
+    send_file();
 
     // очистим старые файлы
     clean_file();
-
-    // отправим на сервер новые
-    send_file();
 
     sleep($periodRun);
 }
@@ -75,6 +74,7 @@ function send_file(): void
     $localFiles = glob($backupFolder . '/' . $fileMask);
 
     if (!empty($localFiles)) {
+        $logger->info("Файлы найдены");
 
         foreach ($localFiles as $localFile) {
             $filename = basename($localFile); // Имя файла без пути
