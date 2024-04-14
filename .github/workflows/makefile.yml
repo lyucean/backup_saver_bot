@@ -32,7 +32,7 @@ jobs:
           echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env
           echo "BACKUPS_FOLDER=${{ vars.BACKUPS_FOLDER }}" >> .env
           echo "MAXIMUM_STORAGE_DAY=${{ vars.MAXIMUM_STORAGE_DAY }}" >> .env
-          echo "PERIOD_START_RUNNER=${{ vars.PERIOD_START_RUNNER }}" >> .env
+          echo "PERIOD_SECONDS_RUN=${{ vars.PERIOD_SECONDS_RUN }}" >> .env
           echo "PERIOD_START_MAIN=${{ vars.PERIOD_START_MAIN }}" >> .env
           echo "FILE_MASK=${{ vars.FILE_MASK }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ vars.TELEGRAM_CHAT_ID }}" >> .env
