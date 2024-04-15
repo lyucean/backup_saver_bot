@@ -15,6 +15,7 @@
         "sabre/dav": "^4.4",
         "ext-sqlite3": "*",
         "sentry/sentry": "^4.0",
-        "logtail/monolog-logtail": "^3.0"
+        "logtail/monolog-logtail": "^3.0",
+      "ext-curl": "*"
     }
 }

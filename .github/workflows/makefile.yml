@@ -27,6 +27,7 @@ jobs:
           echo "SENTRY_DNS=${{ secrets.SENTRY_DNS }}" >> .env
           echo "LOGTAIL_TOKEN=${{ secrets.LOGTAIL_TOKEN }}" >> .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+          echo "HEARTBEAT_TOKEN=${{ secrets.HEARTBEAT_TOKEN }}" >> .env
           
           echo "ENVIRONMENT=${{ vars.ENVIRONMENT }}" >> .env
           echo "WEBDAV_FOLDER=${{ vars.WEBDAV_FOLDER }}" >> .env

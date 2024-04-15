@@ -64,6 +64,9 @@ while (true) {
     // очистим старые файлы
     clean_file();
 
+    // постучимся, что мы живы
+    heartbeat();
+
     sleep($periodRun);
 }
 
@@ -167,6 +170,20 @@ function clean_file() {
 
         $db->markFileAsDeleted($filename); // Помечаем файл как удаленный в базе данных
         $logger->info("Запись о файле '$filename' помечена как удаленная в базе данных.");
+    }
+}
+
+function heartbeat() {
+    if (!empty($_ENV['HEARTBEAT_TOKEN'])) {
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, 'https://uptime.betterstack.com/api/v1/heartbeat/' . $_ENV['HEARTBEAT_TOKEN']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+
+        curl_exec($ch);
+        curl_close($ch);
     }
 }
 
