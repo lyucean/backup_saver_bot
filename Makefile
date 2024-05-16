@@ -4,7 +4,7 @@
 # Подключим файл конфигурации
 include app/.env
 
-# И укажем его для docker-compose
+# И укажем его для docker compose
 ENV = --env-file app/.env
 
 # Добавим красоты и чтоб наши команды было видно в теле скрипта
@@ -34,30 +34,30 @@ restart: ## Restart docker containers
 restart: clean docker-down docker-up
 
 php-bash: ## Подключается к контейнеру PHP
-	docker-compose $(ENV) exec php-cli bash
+	docker compose $(ENV) exec php-cli bash
 
 composer: ## Подключается к контейнеру PHP и работаем с composer
-	docker-compose $(ENV) exec php-cli bash -c "composer -V; bash"
+	docker compose $(ENV) exec php-cli bash -c "composer -V; bash"
 
 composer-install: ## Поставим пакеты композера
 	@echo "$(PURPLE) Поставим пакеты композера $(RESET)"
-	@docker-compose $(ENV) run --rm composer
+	@docker compose $(ENV) run --rm composer
 
 docker-up: ## Поднимем контейнеры
 	@echo "$(PURPLE) Поднимем контейнеры $(RESET)"
-	docker-compose $(ENV) $(PROFILE) up -d
+	docker compose $(ENV) $(PROFILE) up -d
 
 docker-build: ## Соберём образы
 	@echo "$(PURPLE) Соберём образы $(RESET)"
-	docker-compose $(ENV) $(PROFILE) build
+	docker compose $(ENV) $(PROFILE) build
 
 docker-pull: ## Поучим все контейнеры
 	@echo "$(PURPLE) Поучим все контейнеры $(RESET)"
-	docker-compose $(ENV) $(PROFILE) pull --include-deps
+	docker compose $(ENV) $(PROFILE) pull --include-deps
 
 docker-down: ## Остановим контейнеры
 	@echo "$(PURPLE) Остановим контейнеры $(RESET)"
-	docker-compose $(ENV) $(PROFILE) down --remove-orphans
+	docker compose $(ENV) $(PROFILE) down --remove-orphans
 
 clean:  ## Очистим папку логов
 	@echo "$(PURPLE) Очистим папку логов $(RESET)"

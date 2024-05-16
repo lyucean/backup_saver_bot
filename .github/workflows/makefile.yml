@@ -68,7 +68,7 @@ jobs:
     needs: [ build ]
     environment: production  # использовать среду "production"
     steps:
-      - name: "Поднимем docker-compose"
+      - name: "Поднимем docker compose"
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
