@@ -4,8 +4,7 @@ require_once('vendor/autoload.php');
 require_once('db.php');
 require_once('log.php');
 
-// ------------- config
-
+// ------------- config ----------------
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
